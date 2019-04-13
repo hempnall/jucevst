@@ -24,7 +24,6 @@ struct sysex_param {
 typedef std::vector<sysex_param> sysex_page_schema_t;
 typedef std::map< uint8 , sysex_page_schema_t> sysex_schema_t;
 
-void init_sysex_arrays();
 
 void dumpParameterPage( uint8 page , std::function<midibyte_t*(uint8)> data );
 

@@ -59,6 +59,7 @@ public:
 
     void dumpState() ;
     void sendStateToMoxf();
+    void setToSongMode();
     
     
 private:

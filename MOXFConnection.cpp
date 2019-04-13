@@ -51,7 +51,6 @@ bool MOXFConnection::openMidiPorts( const String& portname, midiinput_t& input ,
 
 MOXFConnection::MOXFConnection()
 {
-    init_sysex_arrays();
     initialise_logger();
     
     if ( ! openMidiPorts(MOXF_EDITOR_PORT, editor_input_, editor_output_) ) {
