@@ -118,7 +118,6 @@ void MOXFConnection::process_sysex_data( const midibyte_t * data , int size )
         
     } else {
         
-        Logger::writeToLog("isParameter");
         if ( size < 9 ) return;
         
         sysex.channel = data[6];
@@ -185,21 +184,21 @@ void MOXFConnection::bulkOutput()
     if ( output == nullptr ) return;
     
     output->sendMessageNow(bulkheadermsg);
-//    state_.common_.common.sendToSysEx( output );
-//    state_.common_.reverb.sendToSysEx( output );
-//    state_.common_.chorus.sendToSysEx( output );
-//    state_.common_.insertion_a.sendToSysEx( output );
-//    state_.common_.insertion_b.sendToSysEx( output );
-//    state_.common_.master_eq.sendToSysEx(output);
-//    state_.common_.master_effect.sendToSysEx(output);
-//    state_.common_.appregio.sendToSysEx(output);
-    for ( int i=0 ; i < 1 ; ++i ) {
+    state_.common_.common.sendToSysEx( output );
+    state_.common_.reverb.sendToSysEx( output );
+    state_.common_.chorus.sendToSysEx( output );
+    state_.common_.insertion_a.sendToSysEx( output );
+    state_.common_.insertion_b.sendToSysEx( output );
+    state_.common_.master_eq.sendToSysEx(output);
+    state_.common_.master_effect.sendToSysEx(output);
+    state_.common_.appregio.sendToSysEx(output);
+    for ( int i=0 ; i < 16 ; ++i ) {
         state_.parts_[i].partdata.sendToSysEx(output , i);
     }
-//    for ( int i=0 ; i < 16 ; ++i ) {
-//        state_.parts_[i].arpdata.sendToSysEx(output , i);
-//    }
-   // state_.common_.audio.sendToSysEx(output);
+    for ( int i=0 ; i < 16 ; ++i ) {
+        state_.parts_[i].arpdata.sendToSysEx(output , i);
+    }
+    state_.common_.audio.sendToSysEx(output);
     output->sendMessageNow(bulkfootermsg);
     
 }

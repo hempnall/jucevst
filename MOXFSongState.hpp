@@ -81,6 +81,7 @@ struct MOXFParameters
         message[5] =  MAXSIZE;
         std::memcpy( message + 6 , data , SIZE );
         message[ 6 + SIZE ] = calcChecksum();
+        
         if ( ID_HI == BULK_PART || ID_HI == BULK_PART_ARPEGGIO ) {
             message[8] = chn;
         }

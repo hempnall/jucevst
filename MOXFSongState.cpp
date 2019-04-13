@@ -76,11 +76,23 @@ void MOXFSongState::applyBulkCommon(const MidiSysExInfoWrite& update)
 
 
 
+
 void MOXFSongState::dumpState()
 {
-    juce::String header = header_fn( "hi" , "mid" , "lo" , "Parameter", [](uint8 n) {return n;} );
+    juce::String header = header_fn( "hi" , "mid" , "lo" , "Parameter", 16, [](uint8 n) {return n;} );
     Logger::writeToLog( header  );
-    dumpParameterPage( 37 , [&] (uint8 n ) { return parts_[n].partdata.data; } );
+    
+    dumpParameterPage(  PP_COMMON_COMMON  , common_.common.data );
+    dumpParameterPage(  PP_COMMON_REVERB  , common_.reverb.data );
+    dumpParameterPage(  PP_COMMON_CHORUS  , common_.chorus.data );
+    dumpParameterPage(  PP_COMMON_INSERTION_A  , common_.insertion_a.data );
+    dumpParameterPage(  PP_COMMON_INSERTION_B  , common_.insertion_b.data );
+    dumpParameterPage(  PP_COMMON_MASTER_EQ  , common_.master_eq.data );
+    dumpParameterPage(  PP_COMMON_MASTER_EFFECT  , common_.master_effect.data );
+    dumpParameterPage(  PP_COMMON_ARPEGGIO  , common_.appregio.data );
+    dumpParameterPageWithChannel( PARAMETER_PART , [&] (uint8 n ) { return parts_[n].partdata.data; } );
+    dumpParameterPageWithChannel( PARAMETER_PART_ARPEGGIO , [&] (uint8 n ) { return parts_[n].arpdata.data; } );
+    dumpParameterPage(PP_AUDIO_DATA, common_.audio.data);
 }
 
 MemoryOutputStream& operator << ( MemoryOutputStream& ostrm, const MOXFSongState& state)
@@ -92,7 +104,7 @@ MemoryOutputStream& operator << ( MemoryOutputStream& ostrm, const MOXFSongState
     ostrm << state.common_.master_eq ;
     ostrm << state.common_.insertion_a ;
     ostrm << state.common_.insertion_b ;
-    ostrm << state.common_.master_eq ;
+    ostrm << state.common_.master_effect ;
     for (int i=0; i< 16 ; ++i) {
         ostrm <<  state.parts_[i].partdata;
         ostrm <<  state.parts_[i].arpdata;
@@ -112,7 +124,7 @@ MemoryInputStream& operator >> (  MemoryInputStream& istrm , MOXFSongState& stat
     istrm >>  state.common_.master_eq ;
     istrm >>  state.common_.insertion_a ;
     istrm >>  state.common_.insertion_b ;
-    istrm >>  state.common_.master_eq ;
+    istrm >>  state.common_.master_effect ;
     for (int i=0; i< 16 ; ++i) {
         istrm >>  state.parts_[i].partdata;
         istrm >>  state.parts_[i].arpdata;
