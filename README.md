@@ -61,5 +61,8 @@ When the set is reloaded...
         |                         |               |
         |  reinstate MOXF state   |               |
         |------------------------>|               |
+        |                         | Send bulk dump|
+        |                         |    to mixer   |
+        |                         |-------------->|
 ```
 
