@@ -66,3 +66,13 @@ When the set is reloaded...
         |                         |-------------->|
 ```
 
+Pre-requisites
+--------------
+
+You'll need:
+- the VST3 SDK available from [Steinberg](https://www.steinberg.net/en/company/developers.html)
+- Juce SDK available from [Juce](https://shop.juce.com/get-juce)
+- XCODE (haven't tested it on Windows)
+
+
+
