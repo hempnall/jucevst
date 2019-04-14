@@ -90,7 +90,7 @@ struct MOXFParameters
         MidiMessage m = MidiMessage::createSysExMessage(message, SIZE + 7);
         Logger::writeToLog( String::toHexString( m.getRawData() , m.getRawDataSize() ) );
         output->sendMessageNow( m );
-        Time::waitForMillisecondCounter(100);
+        Time::waitForMillisecondCounter(200);
     }
 
 };
