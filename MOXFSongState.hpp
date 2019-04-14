@@ -65,9 +65,10 @@ struct MOXFParameters
         midibyte_t total = 0;
         for (int i=0 ; i < MAXSIZE ; ++i) {
             total += data[i];
+            total &= 0x7f;
         }
-        midibyte_t chksum =  ( ~( total | 0x80 ) ) + 1;
-        return chksum;
+        midibyte_t chksum =  ( 0x80 - total ) & 0x7f;
+        return chksum ;
     }
     
     void sendToSysEx( MidiOutput* output , midichannel_t chn = 0 )
@@ -87,7 +88,7 @@ struct MOXFParameters
         }
         
         MidiMessage m = MidiMessage::createSysExMessage(message, SIZE + 7);
-        // Logger::writeToLog( String::toHexString( m.getRawData() , m.getRawDataSize() ) );
+        Logger::writeToLog( String::toHexString( m.getRawData() , m.getRawDataSize() ) );
         output->sendMessageNow( m );
         Time::waitForMillisecondCounter(100);
     }
