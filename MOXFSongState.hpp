@@ -98,6 +98,7 @@ struct MOXFParameters
 template< typename T >
 MemoryOutputStream& operator<<( MemoryOutputStream& ostrm, const T& item )
 {
+    Logger::writeToLog(String::formatted("[<<] sha256[%d bytes]: %s", item.MAXSIZE , SHA256( item.data , item.MAXSIZE  ).toHexString().getCharPointer() ));
     ostrm.write( item.data ,item.MAXSIZE );
     return ostrm;
 }
@@ -106,6 +107,7 @@ template< typename T >
 MemoryInputStream& operator>>( MemoryInputStream& istrm,  T& item )
 {
     istrm.read( item.data , item.MAXSIZE );
+    Logger::writeToLog(String::formatted("[>>] sha256[%d bytes]: %s", item.MAXSIZE , SHA256( item.data , item.MAXSIZE  ).toHexString().getCharPointer() ));
     return istrm;
 }
 

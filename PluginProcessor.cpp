@@ -114,14 +114,19 @@ AudioProcessorEditor* Moxfvst3songModeAudioProcessor::createEditor()
 void Moxfvst3songModeAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
     Logger::writeToLog("getStateInformation");
+
     MemoryOutputStream ostr( destData , false );
     ostr << connection_.state_;
+    destData.setSize(2618);
+    Logger::writeToLog(String::formatted("sha256[%d bytes]: %s", destData.getSize() , SHA256(destData).toHexString().getCharPointer() ));
 }
 
 void Moxfvst3songModeAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     Logger::writeToLog("setStateInformation");
+    Logger::writeToLog(String::formatted("sha256[%d bytes]: %s", sizeInBytes  , SHA256(data,sizeInBytes).toHexString().getCharPointer() ));
     MemoryInputStream instr(data,sizeInBytes,true);
+    
     instr >> connection_.state_;
     sendStateToMoxf();
 }

@@ -75,9 +75,9 @@ MOXFConnection::~MOXFConnection()
 
 void MOXFConnection::initialise_logger()
 {
-    String logFilePath = SystemStats::getEnvironmentVariable(JUCE_VST3_LOGFILE, JUCE_VST3_LOGFILE_DEFAULT_VALUE );
-    if (logFilePath.length() > 0) {
-        logger_ = std::make_unique<FileLogger>(  logFilePath , JUCE_VST3_LOGFILE_WELCOME_MESSAGE   );
+    File f(  JUCE_VST3_LOGFILE_DEFAULT_VALUE );
+    if (f.existsAsFile()) {
+        logger_ = std::make_unique<FileLogger>(  f , JUCE_VST3_LOGFILE_WELCOME_MESSAGE   );
         Logger::setCurrentLogger(logger_.get());
     }
 }
@@ -182,7 +182,7 @@ void MOXFConnection::bulkOutput()
     Logger::writeToLog("bulkOutput");
     MidiOutput* output = bulk_output_.get();
     if ( output == nullptr ) return;
-    
+//
     output->sendMessageNow(bulkheadermsg);
     state_.common_.common.sendToSysEx( output );
     state_.common_.reverb.sendToSysEx( output );

@@ -8,9 +8,7 @@
 #ifndef MOXFConnection_hpp
 #define MOXFConnection_hpp
 
-#define JUCE_VST3_LOGFILE "JUCE_VST3_LOGFILE"
-//#define JUCE_VST3_LOGFILE_DEFAULT_VALUE "/Users/james/vst3.log"
-#define JUCE_VST3_LOGFILE_DEFAULT_VALUE ""
+#define JUCE_VST3_LOGFILE_DEFAULT_VALUE "~/vst3.log"
 #define JUCE_VST3_LOGFILE_WELCOME_MESSAGE "VST3 Log"
 #define MOXF_EDITOR_PORT "Yamaha MOXF6/MOXF8 Port4"
 #define MOXF_SYSEX_BULK_PORT "Yamaha MOXF6/MOXF8 Port1"

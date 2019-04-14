@@ -31,7 +31,7 @@ void MOXFSongState::applySysex( const MidiSysExInfoWrite& update )
             parts_[update.channel].partdata.writeToArray( update );
             break;
         case BULK_PART_ARPEGGIO:
-            parts_[update.channel].arpdata.writeToArray( update);
+            parts_[update.channel].arpdata.writeToArray( update );
             break;
         case BULK_AUDIO:
             common_.audio.writeToArray( update);
