@@ -32,6 +32,8 @@ public:
     void handleIncomingMidiMessage(juce::MidiInput *source, const juce::MidiMessage &message) override ;
     void dumpState();
     void bulkOutput();
+    void setReadOnly( bool isReadOnly );
+    void setMuteChannel( midichannel_t chn ,  bool isMuted );
     MOXFSongState state_;
     typedef std::unique_ptr<MidiInput,std::function<void(MidiInput*)>> midiinput_t;
     typedef std::unique_ptr<MidiOutput> midioutput_t;
@@ -51,6 +53,7 @@ private:
     
     void initialise_logger();
     std::unique_ptr<Logger> logger_;
+    bool is_read_only_ = false;
     
     midiinput_t editor_input_;
     midioutput_t editor_output_;

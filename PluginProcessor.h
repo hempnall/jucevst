@@ -60,10 +60,13 @@ public:
     void dumpState() ;
     void sendStateToMoxf();
     void setToSongMode();
+    void setReadOnly( bool isReadOnly );
+    void setMuteChannel( int chn , bool isMuted );
     
     
 private:
     MOXFConnection connection_;
+    bool is_read_only_ = false;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Moxfvst3songModeAudioProcessor)
 };

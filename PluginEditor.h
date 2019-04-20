@@ -27,6 +27,9 @@ public:
     void resized() override;
     void dumpStateButtonClicked();
     void sendStateToMoxfClicked();
+    void readOnlyToggleClicked();
+    void allChannelsToggleClicked();
+    void channelToggleButtonClicked(int chn);
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -34,6 +37,11 @@ private:
     Moxfvst3songModeAudioProcessor& processor;
     TextButton dump_state_button_;
     TextButton send_dump_to_moxf_button_;
+    ToggleButton read_only_toggle_;
+    ToggleButton all_channels_toggle_;
+    ToggleButton channel_toggle_[16];
+    
+    
 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Moxfvst3songModeAudioProcessorEditor)

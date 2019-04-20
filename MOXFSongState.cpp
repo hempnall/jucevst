@@ -18,7 +18,27 @@ void writeToArray( const MidiSysExInfoWrite& update, midibyte_t* start , uint8 m
     std::memcpy( start + update.destindex , update.sourcedata , update.size   );
 }
 
-
+void MOXFSongState::compareSysex( const MidiSysExInfoWrite& update )
+{
+    switch (update.datatype)
+    {
+        case BULK_COMMON:
+            compareBulkCommon(update);
+            break;
+        case BULK_PART:
+            parts_[update.channel].partdata.compareArray( update );
+            break;
+        case BULK_PART_ARPEGGIO:
+            parts_[update.channel].arpdata.compareArray( update );
+            break;
+        case BULK_AUDIO:
+            common_.audio.compareArray( update);
+            break;
+        default:
+            Logger::writeToLog(String::formatted("[default] datatype=%02x destindex=%02x channel=%02x maxsize=%02x size=%d", update.datatype, update.destindex, update.channel , 0, update.size  ));
+            break;
+    }
+}
 
 void MOXFSongState::applySysex( const MidiSysExInfoWrite& update )
 {
@@ -75,7 +95,36 @@ void MOXFSongState::applyBulkCommon(const MidiSysExInfoWrite& update)
 }
 
 
-
+void MOXFSongState::compareBulkCommon(const MidiSysExInfoWrite& update)
+{
+    switch ( update.subtype ) {
+        case COMMON_COMMON:
+            common_.common.compareArray(update);
+            break;
+        case COMMON_CHORUS:
+            common_.chorus.compareArray(update);
+            break;
+        case COMMON_REVERB:
+            common_.reverb.compareArray(update );
+            break;
+        case COMMON_ARPEGGION:
+            common_.appregio.compareArray(update );
+            break;
+        case COMMON_MASTER_EQ:
+            common_.master_eq.compareArray( update  );
+            break;
+        case COMMON_INSERTION_A:
+            common_.insertion_a.compareArray( update  );
+            break;
+        case COMMON_INSERTION_B:
+            common_.insertion_b.compareArray( update  );
+            break;
+        case COMMON_MASTER_EFFECT:
+            common_.master_effect.compareArray( update );
+        default:
+            break;
+    }
+}
 
 void MOXFSongState::dumpState()
 {

@@ -413,9 +413,7 @@ void dumpParameterPageWithChannel( uint8 page , std::function<midibyte_t*(uint8)
         Logger::writeToLog("invalid parameter page in dump paramaeter page");
         return;
     }
-    
 
-    
     for ( sysex_param p : schma->second ) {
         std::string out = header_fn( (uint16) page ,(uint16) 0 , (uint16)p.offset , p.name , 16 ,[&](uint8 n) -> uint16 { return convert_fn( data(n) + p.offset + 4 , p.size ); } );
         Logger::writeToLog( out);

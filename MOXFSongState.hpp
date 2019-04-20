@@ -9,6 +9,7 @@
 #define MOXFSongState_hpp
 
 #include <stdio.h>
+#include <cstring>
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MOXFTypes.h"
 
@@ -41,15 +42,18 @@
 #define MOXF_HI 0x7f
 #define MOXF_LO 0x1c
 #define MODEL_ID 0x00
+#define MODEL_ID_EDITOR 0x01
 #define MIN_SYSEX_SIZE 9
 #define PARAM_HEADER_SIZE 5
 #define BULK_HEADER_SIZE 7
+#define MIDIMESSAGESENDDELAY 200
 
 template< midibyte_t ID_HI, uint8 SIZE ,midibyte_t MIDID = 0 >
 struct MOXFParameters
 {
     const midibyte_t HI = ID_HI;
     const midibyte_t MAXSIZE = SIZE;
+    bool isMuted_;
     midibyte_t MID = MIDID;
     midibyte_t LO;
     midibyte_t data[SIZE] = {0 , ID_HI , MIDID, 0 };
@@ -58,6 +62,26 @@ struct MOXFParameters
     {
         if ( ( update.destindex + update.size ) > MAXSIZE ) return;
         std::memcpy( data + update.destindex , update.sourcedata , update.size   );
+    }
+    
+    void compareArray( const MidiSysExInfoWrite& update )
+    {
+        if ( ( update.destindex + update.size ) > MAXSIZE ) {
+            Logger::writeToLog("reflected bulk dump is larger than structure");
+        }
+        
+        if ( update.size < 2 ) return;
+        
+        midibyte_t* start_of_stored_data = data + update.destindex + 1;
+        midibyte_t* start_of_incoming_data = update.sourcedata + 1;
+        
+        int diff = std::memcmp( start_of_stored_data , start_of_incoming_data  , update.size - 1 );
+        
+        if ( diff == 0 ) {
+            Logger::writeToLog("reflected bulk dump is OK!!!!!!");
+        } else {
+            Logger::writeToLog("reflected bulk dump differs from original");
+        }
     }
 
     midibyte_t calcChecksum()
@@ -73,6 +97,8 @@ struct MOXFParameters
     
     void sendToSysEx( MidiOutput* output , midichannel_t chn = 0 )
     {
+        if ( isMuted_ ) return;
+        
         midibyte_t message[ 7 + SIZE ];
         message[0] =  YAMAHA;
         message[1] =  0x00; // bulk message
@@ -90,7 +116,12 @@ struct MOXFParameters
         MidiMessage m = MidiMessage::createSysExMessage(message, SIZE + 7);
         Logger::writeToLog( String::toHexString( m.getRawData() , m.getRawDataSize() ) );
         output->sendMessageNow( m );
-        Time::waitForMillisecondCounter(200);
+        Time::waitForMillisecondCounter(Time::getMillisecondCounter() + MIDIMESSAGESENDDELAY);
+    }
+    
+    void setMuted( bool isMuted )
+    {
+        isMuted_ = isMuted;
     }
 
 };
@@ -134,15 +165,15 @@ struct MOXFPart
 
 struct MOXFSongState
 {
-
-    
+ 
     MOXFCommon common_;
     MOXFPart parts_[16];
     midibyte_t audiopart_[8];
     
-
     void applyBulkCommon( const MidiSysExInfoWrite& update );
+    void compareBulkCommon( const MidiSysExInfoWrite& update );
     void applySysex( const MidiSysExInfoWrite& update );
+    void compareSysex( const MidiSysExInfoWrite& update );
     void dumpState();
 
 };

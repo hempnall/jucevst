@@ -158,3 +158,12 @@ void Moxfvst3songModeAudioProcessor::setToSongMode()
 {
     
 }
+
+void Moxfvst3songModeAudioProcessor::setReadOnly(bool isReadOnly) {
+    connection_.setReadOnly(isReadOnly);
+}
+
+void Moxfvst3songModeAudioProcessor::setMuteChannel(int chn, bool isMuted)
+{
+    connection_.setMuteChannel(chn, isMuted);
+}

@@ -85,6 +85,8 @@ void MOXFConnection::initialise_logger()
 
 void MOXFConnection::handleIncomingMidiMessage(juce::MidiInput *source, const juce::MidiMessage &message)
 {
+    if (is_read_only_) return;
+    
     if ( source == editor_input_.get()   ) {
         process_editor_data(message);
     } else if ( source == bulk_input_.get() ) {
@@ -103,19 +105,24 @@ void MOXFConnection::process_sysex_data( const midibyte_t * data , int size )
     MidiSysExInfoWrite sysex;
     
     if ( isBulk( data , size )) {
-        
-        if ( data[6] != MODEL_ID ) return;
-        uint16 datasize = getBulkDataSize(data, size);
-        
-        if ( datasize + 7 != size ) return;
-        
 
+        uint16 datasize = getBulkDataSize(data, size);
+        if ( datasize + 7 != size ) return;
+ 
         sysex.channel = data[8];
         sysex.datatype = data[7];
         sysex.destindex = data[9];
         sysex.size = datasize ;
         sysex.sourcedata = (midibyte_t*) &data[6];
         
+        if ( data[6] == MODEL_ID ) {
+            state_.applySysex(sysex);
+        } else if ( data[6] == MODEL_ID_EDITOR ) {
+            state_.compareSysex(sysex);
+        } else {
+            return;
+        }
+
     } else {
         
         if ( size < 9 ) return;
@@ -125,9 +132,9 @@ void MOXFConnection::process_sysex_data( const midibyte_t * data , int size )
         sysex.destindex = data[7] + 4;
         sysex.size = size - 8;
         sysex.sourcedata = (midibyte_t*) &data[8];
-        
+        state_.applySysex(sysex);
     }
-    state_.applySysex(sysex);
+    
 }
 
 bool MOXFConnection::isBulk(const midibyte_t* data , int size)
@@ -201,4 +208,15 @@ void MOXFConnection::bulkOutput()
     state_.common_.audio.sendToSysEx(output);
     output->sendMessageNow(bulkfootermsg);
     
+}
+
+void MOXFConnection::setReadOnly(bool isReadOnly)
+{
+    is_read_only_ = isReadOnly;
+}
+
+void MOXFConnection::setMuteChannel( midichannel_t chn ,  bool isMuted )
+{
+    state_.parts_[chn].partdata.setMuted( isMuted);
+    state_.parts_[chn].arpdata.setMuted( isMuted);
 }
