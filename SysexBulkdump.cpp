@@ -55,15 +55,15 @@ void MOXFBulkdump::send( int milliseconds )
     DELAY( common_.master_effect, output_ , one_time_send_delay )
     DELAY( common_.appregio, output_ , one_time_send_delay )
     
-//    for ( int i=0 ; i < 16 ; ++i ) {
-//        state_.parts_[i].partdata.sendToSysEx(output_ , i);
-//        SLEEP( one_time_send_delay )
-//    }
-//    
-//    for ( int i=0 ; i < 16 ; ++i ) {
-//        state_.parts_[i].arpdata.sendToSysEx(output_ , i);
-//        SLEEP( one_time_send_delay );
-//    }
+    for ( int i=0 ; i < 16 ; ++i ) {
+        state_.parts_[i].partdata.sendToSysEx(output_ , i);
+        SLEEP( one_time_send_delay )
+    }
+    
+    for ( int i=0 ; i < 16 ; ++i ) {
+        state_.parts_[i].arpdata.sendToSysEx(output_ , i);
+        SLEEP( one_time_send_delay );
+    }
     
     DELAY( common_.audio, output_ , one_time_send_delay )
 }

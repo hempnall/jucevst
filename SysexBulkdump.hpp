@@ -26,4 +26,6 @@ private:
     MidiOutput* output_;
 };
 
+
+
 #endif /* SysexBulkdump_hpp */
