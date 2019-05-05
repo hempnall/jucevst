@@ -41,8 +41,5 @@ private:
     ToggleButton all_channels_toggle_;
     ToggleButton channel_toggle_[16];
     
-    
-
-    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Moxfvst3songModeAudioProcessorEditor)
 };

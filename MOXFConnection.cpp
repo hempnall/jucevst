@@ -7,17 +7,11 @@
 
 #include "MOXFConnection.hpp"
 #include "sysexparams.h"
+#include "SysexBulkdump.hpp"
 
-midibyte_t bulkheader[] = {
-    0x43, 0x00, 0x7F, 0x1C, 0x00, 0x04, 0x00 , 0x0E, 0x5F , 0x00, 0x13
-};
 
-midibyte_t bulkfooter[] = {
-   0x43, 0x00, 0x7F, 0x1C, 0x00, 0x04, 0x00 , 0x0F, 0x5F , 0x00, 0x12
-};
 
-MidiMessage bulkheadermsg = MidiMessage::createSysExMessage( bulkheader, sizeof(bulkheader));
-MidiMessage bulkfootermsg = MidiMessage::createSysExMessage( bulkfooter, sizeof(bulkfooter));
+
 
 #define PORT_NOT_FOUND -1
 template< typename T >
@@ -186,28 +180,8 @@ void MOXFConnection::dumpState()
 
 void MOXFConnection::bulkOutput()
 {
-    Logger::writeToLog("bulkOutput");
-    MidiOutput* output = bulk_output_.get();
-    if ( output == nullptr ) return;
-//
-    output->sendMessageNow(bulkheadermsg);
-    state_.common_.common.sendToSysEx( output );
-    state_.common_.reverb.sendToSysEx( output );
-    state_.common_.chorus.sendToSysEx( output );
-    state_.common_.insertion_a.sendToSysEx( output );
-    state_.common_.insertion_b.sendToSysEx( output );
-    state_.common_.master_eq.sendToSysEx(output);
-    state_.common_.master_effect.sendToSysEx(output);
-    state_.common_.appregio.sendToSysEx(output);
-    for ( int i=0 ; i < 16 ; ++i ) {
-        state_.parts_[i].partdata.sendToSysEx(output , i);
-    }
-    for ( int i=0 ; i < 16 ; ++i ) {
-        state_.parts_[i].arpdata.sendToSysEx(output , i);
-    }
-    state_.common_.audio.sendToSysEx(output);
-    output->sendMessageNow(bulkfootermsg);
-    
+    MOXFBulkdump bulkdump( state_ , bulk_output_.get() );
+    bulkdump.send(200);
 }
 
 void MOXFConnection::setReadOnly(bool isReadOnly)

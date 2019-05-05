@@ -60,8 +60,6 @@ private:
     
     midiinput_t bulk_input_;
     midioutput_t bulk_output_;
-    
-
 };
 
 

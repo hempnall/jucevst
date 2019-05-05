@@ -48,23 +48,36 @@
 #define BULK_HEADER_SIZE 7
 #define MIDIMESSAGESENDDELAY 200
 
+struct MOXFParametersBase
+{
+    virtual void writeToArray( const MidiSysExInfoWrite& update ) = 0;
+    virtual void compareArray( const MidiSysExInfoWrite& update ) = 0;
+};
+
+struct MOXFParametersDummy : public MOXFParametersBase
+{
+    virtual void writeToArray( const MidiSysExInfoWrite& update ) {};
+    virtual void compareArray( const MidiSysExInfoWrite& update ) {};
+};
+
 template< midibyte_t ID_HI, uint8 SIZE ,midibyte_t MIDID = 0 >
 struct MOXFParameters
+: public MOXFParametersBase
 {
     const midibyte_t HI = ID_HI;
     const midibyte_t MAXSIZE = SIZE;
-    bool isMuted_;
+    bool isMuted_ = false;
     midibyte_t MID = MIDID;
     midibyte_t LO;
     midibyte_t data[SIZE] = {0 , ID_HI , MIDID, 0 };
     
-    void writeToArray( const MidiSysExInfoWrite& update)
+    virtual void writeToArray( const MidiSysExInfoWrite& update)
     {
         if ( ( update.destindex + update.size ) > MAXSIZE ) return;
         std::memcpy( data + update.destindex , update.sourcedata , update.size   );
     }
     
-    void compareArray( const MidiSysExInfoWrite& update )
+    virtual void compareArray( const MidiSysExInfoWrite& update )
     {
         if ( ( update.destindex + update.size ) > MAXSIZE ) {
             Logger::writeToLog("reflected bulk dump is larger than structure");
@@ -84,15 +97,17 @@ struct MOXFParameters
         }
     }
 
-    midibyte_t calcChecksum()
+    midibyte_t calcChecksum(midibyte_t* start , midibyte_t* end)
     {
+        // The Check sum is the value that results in a value of 0 for the lower 7 bits
+        // when the Model ID, Start Address, Data and Check sum itself are added
         midibyte_t total = 0;
-        for (int i=0 ; i < MAXSIZE ; ++i) {
-            total += data[i];
+        for (midibyte_t* it = start  ; it !=  end; ++it) {
+            total += *it;
             total &= 0x7f;
         }
-        midibyte_t chksum =  ( 0x80 - total ) & 0x7f;
-        return chksum ;
+        return ( 0x80 - total ) % 0x80;
+
     }
     
     void sendToSysEx( MidiOutput* output , midichannel_t chn = 0 )
@@ -107,22 +122,25 @@ struct MOXFParameters
         message[4] =  0x00;
         message[5] =  MAXSIZE;
         std::memcpy( message + 6 , data , SIZE );
-        message[ 6 + SIZE ] = calcChecksum();
         
         if ( ID_HI == BULK_PART || ID_HI == BULK_PART_ARPEGGIO ) {
             message[8] = chn;
         }
+
+        message[ 6 + SIZE ] = calcChecksum( message + 6 , message + SIZE + 6 );
         
         MidiMessage m = MidiMessage::createSysExMessage(message, SIZE + 7);
         Logger::writeToLog( String::toHexString( m.getRawData() , m.getRawDataSize() ) );
         output->sendMessageNow( m );
-        Time::waitForMillisecondCounter(Time::getMillisecondCounter() + MIDIMESSAGESENDDELAY);
+
     }
     
     void setMuted( bool isMuted )
     {
         isMuted_ = isMuted;
     }
+    
+ 
 
 };
 
@@ -165,7 +183,7 @@ struct MOXFPart
 
 struct MOXFSongState
 {
- 
+    bool is_initialised_ = false;
     MOXFCommon common_;
     MOXFPart parts_[16];
     midibyte_t audiopart_[8];
@@ -175,7 +193,11 @@ struct MOXFSongState
     void applySysex( const MidiSysExInfoWrite& update );
     void compareSysex( const MidiSysExInfoWrite& update );
     void dumpState();
-
+    bool isInitialised();
+    void initialise();
+    
+    MOXFParametersBase& getSysex( const MidiSysExInfoWrite& update );
+    MOXFParametersBase& getBulkCommon( const MidiSysExInfoWrite& update );
 };
 
 MemoryOutputStream& operator << ( MemoryOutputStream& , const MOXFSongState& state);

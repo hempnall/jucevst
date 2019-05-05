@@ -17,7 +17,8 @@ Moxfvst3songModeAudioProcessorEditor::Moxfvst3songModeAudioProcessorEditor (Moxf
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    setSize (800, 500);
+    
     addAndMakeVisible (&dump_state_button_);
     dump_state_button_.setButtonText ("Dump State...");
     dump_state_button_.onClick = [this] { dumpStateButtonClicked(); };
