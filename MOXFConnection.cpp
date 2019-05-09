@@ -82,7 +82,7 @@ void MOXFConnection::handleIncomingMidiMessage(juce::MidiInput *source, const ju
     if (is_read_only_) return;
     
     if ( source == editor_input_.get()   ) {
-        process_editor_data(message);
+     //   process_editor_data(message);
     } else if ( source == bulk_input_.get() ) {
         process_midi_data(message);
     } else {
